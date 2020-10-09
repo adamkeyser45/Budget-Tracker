@@ -1,3 +1,5 @@
+const { response } = require("express");
+
 // creates a variable to hold the db connection
 let db;
 
@@ -19,7 +21,7 @@ request.onsuccess = function(event) {
   
     // check if app is online, if yes run uploadBudget() function to send all local db data to api
     if (navigator.onLine) {
-      // uploadBudget();
+      uploadBudget();
     }
 };
   
@@ -39,3 +41,37 @@ function saveRecord(record) {
     // add record to your store with add method
     budgetObjectStore.add(record);
 };
+
+function uploadBudget() {
+    const transaction = db.transaction(['new_budget'], 'readwerite');
+    const budgetObjectStore = transaction.objectStore('new_budget');
+    const getAll = budgetObjectStore.getAll();
+
+    getAll.onsuccess = function() {
+        if (getAll.result.length > 0) {
+            fetch('/api/transaction', {
+                method: 'POST',
+                body: JSON.stringify(getAll.result),
+                headers: {
+                    Accept: 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(serverResponse => {
+                if (serverResponse.message) {
+                    throw new Error(serverResponse);
+                }
+                const transaction = db.transaction(['new_budget'], 'readwrite');
+                const budgetObjectStore = transaction.objectStore('new_budget');
+                budgetObjectStore.clear();
+                alert('All saved budget info has been submitted!!!');
+            })
+            .catch(err => {
+                console.log(err);
+            });
+        }
+    };
+};
+
+window.addEventListener('online', uploadBudget);
