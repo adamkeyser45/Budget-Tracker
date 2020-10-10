@@ -1,5 +1,3 @@
-const { response } = require("express");
-
 // creates a variable to hold the db connection
 let db;
 
@@ -27,7 +25,7 @@ request.onsuccess = function(event) {
   
 request.onerror = function(event) {
     // log error here
-    console.log(event.target.errorCode);
+    console.log("Error: " + event.target.errorCode);
 };
 
 // This function will be executed if we attempt to submit a new budget and there's no internet connection
@@ -43,13 +41,13 @@ function saveRecord(record) {
 };
 
 function uploadBudget() {
-    const transaction = db.transaction(['new_budget'], 'readwerite');
+    const transaction = db.transaction(['new_budget'], 'readwrite');
     const budgetObjectStore = transaction.objectStore('new_budget');
     const getAll = budgetObjectStore.getAll();
 
     getAll.onsuccess = function() {
         if (getAll.result.length > 0) {
-            fetch('/api/transaction', {
+            fetch('/api/transaction/bulk', {
                 method: 'POST',
                 body: JSON.stringify(getAll.result),
                 headers: {
@@ -58,18 +56,15 @@ function uploadBudget() {
                 }
             })
             .then(response => response.json())
-            .then(serverResponse => {
-                if (serverResponse.message) {
-                    throw new Error(serverResponse);
-                }
+            .then(() => {
+               
                 const transaction = db.transaction(['new_budget'], 'readwrite');
                 const budgetObjectStore = transaction.objectStore('new_budget');
                 budgetObjectStore.clear();
                 alert('All saved budget info has been submitted!!!');
-            })
-            .catch(err => {
-                console.log(err);
+                location.reload();
             });
+        
         }
     };
 };

@@ -1,12 +1,9 @@
-const CACHE_NAME = 'my-site-cache-v1';
-const DATA_CACHE_NAME = 'data-cache-v1';
-
 const FILES_TO_CACHE = [
     '/',
     '/index.html',
     '/manifest.json',
     '/service-worker.js',
-    '/css/style.css',
+    '/css/styles.css',
     '/icons/icon-72x72.png',
     '/icons/icon-96x96.png',
     '/icons/icon-128x128.png',
@@ -18,6 +15,9 @@ const FILES_TO_CACHE = [
     '/js/idb.js',
     '/js/index.js'
 ];
+
+const CACHE_NAME = 'budget-tracker-v1';
+const DATA_CACHE_NAME = 'budget-tracker-data-cache-v1';
 
 self.addEventListener('install', function (evt) {
     evt.waitUntil(
