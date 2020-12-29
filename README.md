@@ -1,4 +1,4 @@
-# mod19challenge
+# Budget Tracker
 A budget tracker application that allows for offline access and functionality.
 
 ## Description: 
